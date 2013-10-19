@@ -1,6 +1,16 @@
 module SimpleParser
   class Parser
+    include SimpleParser::StateMachine
     include SimpleParser::TagLibrary
+
+    attr_accessor :input, :stream, :tag_stack, :buffer, :tag_name
+
+    before_transition :reset_tag_name,   [:tag_name, :closing_tag_name]
+    before_transition :add_tag_to_stack, :text, from: [:tag]
+    before_transition :close_tag,        :text, from: [:closing_tag]
+    before_transition :finish_tag,       :text, from: [:tag, :closing_tag]
+    before_transition :flush_buffer,     :text, from: [:comment]
+    before_transition :flush_buffer,     :end
 
     def initialize(input)
       @input = input
@@ -11,25 +21,31 @@ module SimpleParser
       buffer.to_s
     end
 
-    private
-
-    attr_accessor :input, :stream, :tag_stack, :state, :buffer, :tag_name
 
     def parse!
       reset!
-      while !stream.empty?
-        char = stream.fetch
-        value, next_state = Array(self.send("parse_#{state}".to_sym, char))
+      read while !stream.empty?
+      transition(:end)
+    end
 
-        if value === nil
-          buffer.add char
-        elsif value
-          buffer.add value
-        end
+    def read
+      char = stream.fetch
+      value, next_state = Array(self.send("parse_#{state}".to_sym, char))
 
-        transition(next_state) if next_state
+      if value === nil
+        buffer.add char
+      elsif value
+        buffer.add value
       end
-      buffer.flush(true)
+
+      transition(next_state) if next_state
+    end
+
+    def flush_buffer
+      if buffer.buffered? && state == :text
+        buffer.wrap("<p>", "</p>")
+      end
+      buffer.flush
     end
 
     def parse_attribute_name(char)
@@ -73,7 +89,7 @@ module SimpleParser
     def parse_comment(char)
       case
       when char == "-" && stream.peek?("->")
-        stream.discard 2
+        stream.discard(2)
         ["-->", :text]
       end
     end
@@ -97,7 +113,7 @@ module SimpleParser
     def parse_tag_name(char)
       case
       when char =~ /\w/
-        @tag_name << char
+        @tag_name += char
         char
       else
         stream.reinject char
@@ -108,7 +124,7 @@ module SimpleParser
     def parse_closing_tag_name(char)
       case
       when char =~ /\w/
-        @tag_name << char
+        @tag_name += char
         char
       else
         stream.reinject char
@@ -118,9 +134,10 @@ module SimpleParser
 
     def parse_left_angled_quote(char)
       case
+
       # Comment
       when stream.peek?("!--")
-        stream.discard 3
+        stream.discard(3)
         ["<!--", :comment]
 
       # Opening tag
@@ -129,7 +146,7 @@ module SimpleParser
 
       # Closing block level tag
       when stream.peek?(closing(block_level_tags))
-        buffer.flush(true)
+        flush_buffer
         stream.discard
         ["</", :closing_tag_name]
 
@@ -157,7 +174,7 @@ module SimpleParser
 
       # Paragraph break
       when char == "\n" && stream.peek?("\n")
-        buffer.flush(true)
+        flush_buffer
         stream.strip_whitespace
         false
 
@@ -168,37 +185,18 @@ module SimpleParser
       end
     end
 
-
-    def transition(new_state)
-      # Starting a tag name
-      if new_state == :tag_name || new_state == :closing_tag_name
-        @tag_name = []
+    def finish_tag
+      if block_level_tags.include?(tag_name)
+        flush_buffer
       end
+    end
 
-      # Opening tag finished
-      if state == :tag && new_state == :text
-        @tag_stack << tag_name.join
-      end
+    def add_tag_to_stack
+      @tag_stack << tag_name
+    end
 
-      # Closing tag finished
-      if state == :closing_tag && new_state == :text
-        unwind_tag_stack(tag_name.join)
-      end
-
-      # Flush after block level tags
-      if new_state == :text && (state == :tag || state == :closing_tag)
-        if block_level_tags.include?(tag_name.join)
-          buffer.flush
-        end
-      end
-
-      # Flush after comment
-      if new_state == :text && state == :comment
-        buffer.flush
-      end
-
-      #puts "Transition to #{new_state}"
-      @state = new_state
+    def close_tag
+      unwind_tag_stack(tag_name)
     end
 
     def unwind_tag_stack(tag)
@@ -207,10 +205,15 @@ module SimpleParser
       end
     end
 
+    def reset_tag_name
+      @tag_name = ""
+    end
+
     def reset!
       @buffer = SimpleParser::OutputBuffer.new
       @stream = SimpleParser::InputStream.new(input)
       @tag_stack = []
+      reset_tag_name
       @state = :text
     end
   end
