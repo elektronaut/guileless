@@ -1,8 +1,8 @@
 module SimpleParser
-  module StateMachine
+  class StateMachine
     class NoStateError < StandardError; end
 
-    module ClassMethods
+    class << self
       def transitions
         @transitions ||= []
       end
@@ -10,10 +10,6 @@ module SimpleParser
       def before_transition(name, states, options={})
         transitions << [name, Array(states), options]
       end
-    end
-
-    def self.included(klass)
-      klass.send(:extend, SimpleParser::StateMachine::ClassMethods)
     end
 
     def state

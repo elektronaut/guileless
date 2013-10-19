@@ -15,10 +15,7 @@ module SimpleParser
       @output_buffer.join.strip != ""
     end
 
-    def flush(paragraph=false)
-      if paragraph && buffered?
-        wrap("<p>", "</p>")
-      end
+    def flush
       @output += @output_buffer
       @output_buffer = []
     end
