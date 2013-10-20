@@ -1,9 +1,10 @@
-require_relative "guileless/input_stream"
-require_relative "guileless/output_buffer"
-require_relative "guileless/parse_methods"
-require_relative "guileless/state_machine"
-require_relative "guileless/tag_library"
-require_relative "guileless/parser"
+require "guileless/input_stream"
+require "guileless/output_buffer"
+require "guileless/parse_methods"
+require "guileless/state_machine"
+require "guileless/tag_library"
+require "guileless/parser"
+require "guileless/version"
 
 module Guileless
   class << self
