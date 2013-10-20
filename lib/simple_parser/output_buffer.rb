@@ -12,7 +12,7 @@ module SimpleParser
     end
 
     def buffered?
-      @output_buffer.join.strip != ""
+      @output_buffer.length > 0
     end
 
     def flush

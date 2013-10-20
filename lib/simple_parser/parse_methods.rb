@@ -93,6 +93,11 @@ module SimpleParser
         stream.discard(3)
         ["<!--", :comment]
 
+      # Opening block tag
+      when stream.peek?(block_level_tags)
+        flush_buffer
+        [char, :tag_name]
+
       # Opening tag
       when stream.peek?(html_tags)
         [char, :tag_name]
@@ -110,6 +115,7 @@ module SimpleParser
 
       # Escape left angled bracket
       else
+        @char_count += 4
         "&lt;"
       end
     end
@@ -123,7 +129,13 @@ module SimpleParser
 
       # Escape right angled bracket
       when char == ">"
+        @char_count += 4
         "&gt;"
+
+      # Escape ampersands
+      when char == "&" && !stream.peek?("amp;")
+        @char_count += 5
+        "&amp;"
 
       # Paragraph break
       when char == "\n" && stream.peek?("\n")
@@ -134,6 +146,10 @@ module SimpleParser
       # Line break
       when char == "\n"
         "<br>"
+
+      when char !=~ /\s/
+        @char_count += 1
+        char
 
       end
     end

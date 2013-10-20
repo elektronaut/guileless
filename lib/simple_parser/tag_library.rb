@@ -25,5 +25,9 @@ module SimpleParser
         noscript ol output p pre section table tfoot ul video
       }
     end
+
+    def paragraph_container_tags
+      %w{article aside blockquote div footer header}
+    end
   end
 end
