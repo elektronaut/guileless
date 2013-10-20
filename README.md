@@ -13,6 +13,14 @@ tags, and will happily format text nodes inside `div`s and `blockquote`s.
 
 However, it does **NOT** do any sanitation on the input.
 
+## Installation
+
+    gem install guileless
+
+or add it to your gemfile:
+
+    gem "guileless"
+
 ## Usage
 
 ```ruby
