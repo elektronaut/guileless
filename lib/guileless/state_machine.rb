@@ -1,4 +1,4 @@
-module SimpleParser
+module Guileless
   class StateMachine
     class NoStateError < StandardError; end
 

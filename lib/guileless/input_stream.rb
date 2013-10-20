@@ -1,4 +1,4 @@
-module SimpleParser
+module Guileless
   class InputStream
     def initialize(input)
       @buffer = input.chars.to_a

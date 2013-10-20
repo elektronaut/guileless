@@ -1,4 +1,4 @@
-module SimpleParser
+module Guileless
   class OutputBuffer
     def initialize
       @output_buffer = []

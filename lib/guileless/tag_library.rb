@@ -1,4 +1,4 @@
-module SimpleParser
+module Guileless
   module TagLibrary
     def closing(tags)
       tags.map{|t| "/#{t}" }

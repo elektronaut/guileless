@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe SimpleParser do
-  let(:parser) { SimpleParser }
+describe Guileless do
+  let(:parser) { Guileless }
 
   describe ".parse" do
     it "allows comments" do

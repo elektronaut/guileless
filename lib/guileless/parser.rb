@@ -1,7 +1,7 @@
-module SimpleParser
-  class Parser < SimpleParser::StateMachine
-    include SimpleParser::TagLibrary
-    include SimpleParser::ParseMethods
+module Guileless
+  class Parser < Guileless::StateMachine
+    include Guileless::TagLibrary
+    include Guileless::ParseMethods
 
     attr_reader :input, :stream, :tag_stack, :buffer, :tag_name, :char_count
 
@@ -86,8 +86,8 @@ module SimpleParser
 
     def reset!
       @char_count = 0
-      @buffer = SimpleParser::OutputBuffer.new
-      @stream = SimpleParser::InputStream.new(input)
+      @buffer = Guileless::OutputBuffer.new
+      @stream = Guileless::InputStream.new(input)
       @tag_stack = []
       reset_tag_name
       @state = :text

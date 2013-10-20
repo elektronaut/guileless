@@ -1,4 +1,4 @@
-module SimpleParser
+module Guileless
   module ParseMethods
 
     def parse_attribute_name(char)
