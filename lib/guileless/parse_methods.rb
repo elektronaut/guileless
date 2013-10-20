@@ -1,6 +1,18 @@
 module Guileless
   module ParseMethods
 
+    def escape_ampersand
+      value = stream.peek?("amp;") ? "&" : "&amp;"
+      @char_count += value.length
+      value
+    end
+
+    def start_tag
+      if stream.peek?(block_level_tags) || stream.peek?(closing(block_level_tags))
+        flush_buffer
+      end
+    end
+
     def parse_attribute_name(char)
       case
       when char !=~ /[\w\-]/
@@ -63,26 +75,19 @@ module Guileless
       end
     end
 
-    def parse_tag_name(char)
+    def parse_tag_name(char, next_state=:tag)
       case
       when char =~ /\w/
         @tag_name += char
         char
       else
         stream.reinject char
-        [false, :tag]
+        [false, next_state]
       end
     end
 
     def parse_closing_tag_name(char)
-      case
-      when char =~ /\w/
-        @tag_name += char
-        char
-      else
-        stream.reinject char
-        [false, :closing_tag]
-      end
+      parse_tag_name(char, :closing_tag)
     end
 
     def parse_left_angled_quote(char)
@@ -93,23 +98,14 @@ module Guileless
         stream.discard(3)
         ["<!--", :comment]
 
-      # Opening block tag
-      when stream.peek?(block_level_tags)
-        flush_buffer
-        [char, :tag_name]
-
       # Opening tag
       when stream.peek?(html_tags)
+        start_tag
         [char, :tag_name]
-
-      # Closing block level tag
-      when stream.peek?(closing(block_level_tags))
-        flush_buffer
-        stream.discard
-        ["</", :closing_tag_name]
 
       # Closing tag
       when stream.peek?(closing(html_tags))
+        start_tag
         stream.discard
         ["</", :closing_tag_name]
 
@@ -117,6 +113,16 @@ module Guileless
       else
         @char_count += 4
         "&lt;"
+      end
+    end
+
+    def parse_linebreak
+      if stream.peek?("\n")
+        flush_buffer
+        stream.strip_whitespace
+        false
+      else
+        "<br>"
       end
     end
 
@@ -133,19 +139,12 @@ module Guileless
         "&gt;"
 
       # Escape ampersands
-      when char == "&" && !stream.peek?("amp;")
-        @char_count += 5
-        "&amp;"
-
-      # Paragraph break
-      when char == "\n" && stream.peek?("\n")
-        flush_buffer
-        stream.strip_whitespace
-        false
+      when char == "&"
+        escape_ampersand
 
       # Line break
       when char == "\n"
-        "<br>"
+        parse_linebreak
 
       when char !=~ /\s/
         @char_count += 1
