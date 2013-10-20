@@ -7,7 +7,7 @@ require_relative "guileless/parser"
 
 module Guileless
   class << self
-    def parse(str)
+    def format(str)
       Parser.new(str).to_html
     end
   end
