@@ -4,7 +4,7 @@ Guileless is a naive HTML preprocessor. It does three things:
 
 1. Single line breaks are converted to `<br>`
 2. Several consecutive line breaks are treated as paragraphs and wrapped in `<p>`
-3. Converts stray `<`, `>`, and `&`s to HTML entities.
+3. Converts stray `<`, `>`, and `&`s to character entities.
 
 Why is this more useful than, say, Rails' built in `simple_format`?
 

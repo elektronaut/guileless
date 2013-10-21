@@ -42,6 +42,11 @@ describe Guileless do
       Guileless.format("&amp;").should == "<p>&amp;</p>"
     end
 
+    it "doesn't escape other character entities" do
+      Guileless.format("&nbsp;").should == "<p>&nbsp;</p>"
+      Guileless.format("&#x1f4a9;").should == "<p>&#x1f4a9;</p>"
+    end
+
     it "understands empty attributes" do
       Guileless.format("<blockquote data-foo>stuff</blockquote>").should == "<blockquote data-foo><p>stuff</p></blockquote>"
     end

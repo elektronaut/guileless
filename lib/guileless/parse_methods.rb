@@ -2,7 +2,7 @@ module Guileless
   module ParseMethods
 
     def escape_ampersand
-      value = stream.peek?("amp;") ? "&" : "&amp;"
+      value = stream.peek?(/[\w\d]+;/) ? "&" : "&amp;"
       @char_count += value.length
       value
     end
