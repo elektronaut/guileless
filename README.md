@@ -11,7 +11,11 @@ Why is this more useful than, say, Rails' built in `simple_format`?
 Well, it's actually a real (if simplistic) HTML parser. It understands nested
 tags, and will happily format text nodes inside `div`s and `blockquote`s.
 
-However, it does **NOT** do any sanitation on the input.
+Valid HTML is assumed, and it doesn't do any sanitation on the input.
+Anything it doesn't need to understand is simply passed through, but
+mismatched or missing opening and closing tags on block level elements will break.
+
+
 
 ## Installation
 
@@ -26,6 +30,11 @@ or add it to your gemfile:
 ```ruby
 Guileless.format("<div>foo</div>") # => "<div><p>foo</p></div>"
 ```
+
+## Contributing
+
+&#x266B; Fork it, use it, break it, fix it,
+branch it, push it, pull request it.
 
 ## License
 

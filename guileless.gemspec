@@ -11,7 +11,6 @@ Gem::Specification.new do |s|
   s.description = "Naive HTML preprocessor"
   s.authors     = ["Inge Jørgensen"]
   s.email       = 'inge@elektronaut.no'
-  s.files       = ["lib/hola.rb"]
   s.homepage    = 'http://github.com/elektronaut/guileless'
   s.license     = 'MIT'
   s.required_ruby_version = Gem::Requirement.new(">= 1.9.2")
@@ -20,5 +19,4 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-
 end
