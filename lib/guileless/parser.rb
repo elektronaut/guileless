@@ -84,10 +84,16 @@ module Guileless
       @tag_name = ""
     end
 
+    def filtered_input
+      # Ignoring carriage return should be fine for now,
+      # the output doesn't contain newlines.
+      input.gsub(/\r/, '')
+    end
+
     def reset!
       @char_count = 0
       @buffer = Guileless::OutputBuffer.new
-      @stream = Guileless::InputStream.new(input)
+      @stream = Guileless::InputStream.new(filtered_input)
       @tag_stack = []
       reset_tag_name
       @state = :text

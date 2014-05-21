@@ -20,10 +20,12 @@ describe Guileless do
 
     it "converts single breaks to <br>" do
       Guileless.format("foo\nbar").should == "<p>foo<br>bar</p>"
+      Guileless.format("foo\r\nbar").should == "<p>foo<br>bar</p>"
     end
 
     it "converts double breaks to <br>" do
       Guileless.format("foo\n\nbar").should == "<p>foo</p><p>bar</p>"
+      Guileless.format("foo\r\n\r\nbar").should == "<p>foo</p><p>bar</p>"
     end
 
     it "escapes left angled brackets" do
