@@ -22,8 +22,12 @@ describe Guileless do
       Guileless.format("foo\nbar").should == "<p>foo<br>bar</p>"
     end
 
-    it "converts double breaks to <br>" do
+    it "converts double breaks to <p>" do
       Guileless.format("foo\n\nbar").should == "<p>foo</p><p>bar</p>"
+    end
+
+    it "converts multiple breaks to <p><br><p>" do
+      Guileless.format("foo\n\n\n\nbar").should == "<p>foo</p><br><br><p>bar</p>"
     end
 
     it "escapes left angled brackets" do
