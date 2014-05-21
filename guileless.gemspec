@@ -6,7 +6,7 @@ require "guileless/version"
 Gem::Specification.new do |s|
   s.name        = 'guileless'
   s.version     = Guileless::VERSION
-  s.date        = '2013-10-20'
+  s.date        = '2014-05-21'
   s.summary     = "Naive HTML preprocessor"
   s.description = "Naive HTML preprocessor"
   s.authors     = ["Inge Jørgensen"]
